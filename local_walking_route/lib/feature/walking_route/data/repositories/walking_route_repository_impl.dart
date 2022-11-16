@@ -1,3 +1,5 @@
+import 'package:local_walking_route/core/error/exceptions.dart';
+import 'package:local_walking_route/core/platform/all_in_one_info.dart';
 import 'package:local_walking_route/core/platform/gps_info.dart';
 import 'package:local_walking_route/core/platform/location_permission_info.dart';
 import 'package:local_walking_route/core/platform/network_info.dart';
@@ -9,21 +11,21 @@ import 'package:local_walking_route/feature/walking_route/domain/repositories/wa
 
 class WalkingRouteRepositoryImpl extends WalkingRouteRepository {
   final CurrentLocationRemoteDataSource remoteDataSource;
-  final NetworkInfo networkInfo;
-  final GpsInfo gpsInfo;
-  final LocationPermissionInfo locationPermissionInfo;
+  final AllInfo allInfo;
 
-  WalkingRouteRepositoryImpl(
-      {this.remoteDataSource,
-      this.networkInfo,
-      this.gpsInfo,
-      this.locationPermissionInfo});
+  WalkingRouteRepositoryImpl({
+    this.remoteDataSource,
+    this.allInfo,
+  });
 
   @override
-  Future<Either<Failure, CurrentLocation>> getCurrentLocation() {
-    networkInfo.isConnected;
-    gpsInfo.isEnabled;
-    locationPermissionInfo.checkPermissionInfo;
-    return null;
+  Future<Either<Failure, CurrentLocation>> getCurrentLocation() async {
+    allInfo.isAllEnabled;
+    try {
+      final remoteCurrentLocation = await remoteDataSource.getCurrentLocation();
+      return Right(remoteCurrentLocation);
+    } on ServerException {
+      return Left(ServerFailure());
+    }
   }
 }

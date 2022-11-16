@@ -38,6 +38,8 @@ dependencies:
   equatable: ^2.0.3
   # Functional programming thingies
   dartz: ^0.10.0
+  data_connection_checker: ^0.3.4
+  geolocator: ^8.0.0
 
 
   # The following adds the Cupertino Icons font to your application.
