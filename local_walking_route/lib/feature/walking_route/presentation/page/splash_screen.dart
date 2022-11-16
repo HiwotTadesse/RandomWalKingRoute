@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:local_walking_route/core/usecases/usecase.dart';
 import 'package:local_walking_route/feature/walking_route/domain/usecases/get_current_location.dart';
-import 'package:local_walking_route/feature/walking_route/presentation/bloc/bloc/walking_route_bloc_bloc.dart';
+import 'package:local_walking_route/feature/walking_route/presentation/bloc/bloc/walking_route_bloc.dart';
+import 'package:local_walking_route/feature/walking_route/presentation/bloc/bloc/walking_route_event.dart';
+import 'package:local_walking_route/feature/walking_route/presentation/bloc/bloc/walking_route_state.dart';
 import 'package:local_walking_route/feature/walking_route/presentation/page/walking_route_page.dart';
 
 import '../../../../injection_container.dart';
@@ -35,14 +37,11 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-        create: (_) => sl<WalkingRouteBlocBloc>(),
-        child: buildSplashScreen(context));
+    return buildSplashScreen(context);
   }
 
   Scaffold buildSplashScreen(BuildContext context) {
-    BlocProvider.of<WalkingRouteBlocBloc>(context)
-        .add(GetCurrentLocationEvent());
+    BlocProvider.of<WalkingRouteBloc>(context).add(GetCurrentLocationEvent());
     return Scaffold(
         body: Stack(children: <Widget>[
       Container(
@@ -103,13 +102,13 @@ class _SplashScreenState extends State<SplashScreen>
             AnimatedOpacity(
                 opacity: 1.0,
                 duration: const Duration(milliseconds: 420),
-                child: BlocBuilder<WalkingRouteBlocBloc, WalkingRouteBlocState>(
+                child: BlocBuilder<WalkingRouteBloc, WalkingRouteState>(
                     builder: (context, state) {
-                  if (state is WalkingRouteBlocInitial) {
+                  if (state is WalkingRouteInitial) {
                     return buildLoadingAnimation();
-                  } else if (state is WalkingRouteBlocLoading) {
+                  } else if (state is WalkingRouteLoading) {
                     return buildLoadingAnimation();
-                  } else if (state is WalkingRouteBlocLoaded) {
+                  } else if (state is WalkingRouteLoaded) {
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       Navigator.pushReplacement(
                           context,
@@ -120,7 +119,7 @@ class _SplashScreenState extends State<SplashScreen>
                     });
 
                     return buildLoadingAnimation();
-                  } else if (state is WalkingRouteBlocError) {
+                  } else if (state is WalkingRouteError) {
                     return const Center(
                       child: Text(
                         'Please check your internet connection',

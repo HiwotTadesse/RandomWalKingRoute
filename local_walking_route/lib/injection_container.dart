@@ -8,7 +8,7 @@ import 'package:local_walking_route/core/platform/network_info.dart';
 import 'package:local_walking_route/feature/walking_route/data/repositories/walking_route_repository_impl.dart';
 import 'package:local_walking_route/feature/walking_route/domain/repositories/walking_route_repository.dart';
 import 'package:local_walking_route/feature/walking_route/domain/usecases/get_current_location.dart';
-import 'package:local_walking_route/feature/walking_route/presentation/bloc/bloc/walking_route_bloc_bloc.dart';
+import 'package:local_walking_route/feature/walking_route/presentation/bloc/bloc/walking_route_bloc.dart';
 
 import 'feature/walking_route/data/datasources/current_location_remote_data_source.dart';
 
@@ -16,7 +16,7 @@ final sl = GetIt.instance;
 
 Future<void> init() async {
   sl.registerFactory(
-    () => WalkingRouteBlocBloc(
+    () => WalkingRouteBloc(
       location: sl(),
     ),
   );
