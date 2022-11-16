@@ -12,7 +12,7 @@ class AllInfoImpl implements AllInfo {
   final GpsInfo gpsInfo;
   final LocationPermissionInfo locationPermissionInfo;
 
-  AllInfoImpl(this.networkInfo, this.gpsInfo, this.locationPermissionInfo);
+  AllInfoImpl({this.networkInfo, this.gpsInfo, this.locationPermissionInfo});
 
   @override
   Future<bool> get isAllEnabled async {
@@ -28,7 +28,7 @@ class AllInfoImpl implements AllInfo {
         } else if (permission == LocationPermission.deniedForever) {
           return false;
         } else {
-          return false;
+          return true;
         }
       } else {
         return true;

@@ -20,10 +20,15 @@ class WalkingRouteRepositoryImpl extends WalkingRouteRepository {
 
   @override
   Future<Either<Failure, CurrentLocation>> getCurrentLocation() async {
-    allInfo.isAllEnabled;
     try {
-      final remoteCurrentLocation = await remoteDataSource.getCurrentLocation();
-      return Right(remoteCurrentLocation);
+      final info = await allInfo.isAllEnabled;
+      if (info) {
+        final remoteCurrentLocation =
+            await remoteDataSource.getCurrentLocation();
+        return Right(remoteCurrentLocation);
+      } else {
+        throw ServerException;
+      }
     } on ServerException {
       return Left(ServerFailure());
     }

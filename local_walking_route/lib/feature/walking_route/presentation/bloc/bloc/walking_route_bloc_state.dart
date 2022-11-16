@@ -13,7 +13,7 @@ class WalkingRouteBlocLoading extends WalkingRouteBlocState {}
 
 class WalkingRouteBlocLoaded extends WalkingRouteBlocState {
   final CurrentLocation currentLocation;
-  const WalkingRouteBlocLoaded(this.currentLocation);
+  const WalkingRouteBlocLoaded({this.currentLocation});
 
   @override
   List<Object> get props => [currentLocation];
