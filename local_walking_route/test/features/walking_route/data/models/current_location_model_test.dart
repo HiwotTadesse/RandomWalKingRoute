@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:local_walking_route/feature/walking_route/data/models/current_location_model.dart';
-import 'package:local_walking_route/feature/walking_route/domain/entities/CurrentLocation.dart';
+import 'package:local_walking_route/feature/walking_route/domain/entities/current_location.dart';
 
 import '../../../../fixtures/fixture_reader.dart';
 
@@ -12,8 +12,7 @@ void main() {
 
   test('should return a valid model when the JSON number is an double',
       () async {
-    final Map<String, dynamic> jsonmap =
-        json.decode(fixture('current_location.json'));
+    final Map<String, dynamic> jsonmap = json.decode(fixture('route.json'));
 
     final result = CurrentLocationModel.fromJson(jsonmap);
 

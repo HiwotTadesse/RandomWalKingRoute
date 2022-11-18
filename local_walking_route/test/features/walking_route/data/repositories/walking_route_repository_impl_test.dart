@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:local_walking_route/core/error/exceptions.dart';
@@ -10,15 +11,15 @@ import 'package:local_walking_route/core/platform/network_info.dart';
 import 'package:local_walking_route/feature/walking_route/data/datasources/current_location_remote_data_source.dart';
 import 'package:local_walking_route/feature/walking_route/data/models/current_location_model.dart';
 import 'package:local_walking_route/feature/walking_route/data/repositories/walking_route_repository_impl.dart';
-import 'package:local_walking_route/feature/walking_route/domain/entities/CurrentLocation.dart';
 import 'package:mockito/mockito.dart';
+import 'dart:convert';
+
+import '../../../../fixtures/fixture_reader.dart';
 
 class MockRemoteDataSource extends Mock
     implements CurrentLocationRemoteDataSource {}
 
 class MockNetworkInfo extends Mock implements NetworkInfo {}
-
-class MockAllInfo extends Mock implements AllInfo {}
 
 class MockGpsInfo extends Mock implements GpsInfo {}
 
@@ -31,43 +32,36 @@ void main() {
   MockNetworkInfo mockNetworkInfo;
   MockGpsInfo mockGpsInfo;
   MockLocationPermissionInfo mockLocationPermissionInfo;
-  MockAllInfo mockAllInfo;
 
   setUp(() {
     mockRemoteDataSource = MockRemoteDataSource();
     mockNetworkInfo = MockNetworkInfo();
     mockGpsInfo = MockGpsInfo();
     mockLocationPermissionInfo = MockLocationPermissionInfo();
-    mockAllInfo = MockAllInfo();
     repositoryImpl = WalkingRouteRepositoryImpl(
-        remoteDataSource: mockRemoteDataSource, allInfo: mockAllInfo);
+        remoteDataSource: mockRemoteDataSource,
+        networkInfo: mockNetworkInfo,
+        gpsInfo: mockGpsInfo,
+        locationPermissionInfo: mockLocationPermissionInfo);
   });
   group('getCurrentLocation', () {
     test('should check if the device is online', () async {
       when(mockNetworkInfo.isConnected).thenAnswer((_) async => true);
       repositoryImpl.getCurrentLocation();
-      verify(mockAllInfo.isAllEnabled);
+      verify(mockNetworkInfo.isConnected);
     });
 
     test('should check if the device\'s gps location enabled', () async {
       when(mockGpsInfo.isEnabled).thenAnswer((_) async => true);
       repositoryImpl.getCurrentLocation();
-      verify(mockAllInfo.isAllEnabled);
+      verify(mockGpsInfo.isEnabled);
     });
 
     test('should check if the user has garanted permission', () async {
       when(mockLocationPermissionInfo.checkPermissionInfo())
           .thenAnswer((_) async => LocationPermission.always);
       repositoryImpl.getCurrentLocation();
-      verify(mockAllInfo.isAllEnabled);
-    });
-
-    test('should check device is online, gps enabled and permission granted',
-        () async {
-      when(mockAllInfo.isAllEnabled).thenAnswer((_) async => true);
-
-      repositoryImpl.getCurrentLocation();
-      verify(mockAllInfo.isAllEnabled);
+      verify(mockLocationPermissionInfo.checkPermissionInfo());
     });
   });
 
@@ -77,7 +71,7 @@ void main() {
     final tCurrentLocation = tCurrentLocationModel;
 
     setUp(() {
-      when(mockAllInfo.isAllEnabled).thenAnswer((_) async => true);
+      // when(mockAllInfo.isAllEnabled).thenAnswer((_) async => true);
     });
 
     test(

@@ -8,23 +8,35 @@ import 'package:local_walking_route/core/platform/network_info.dart';
 import 'package:local_walking_route/feature/walking_route/data/repositories/walking_route_repository_impl.dart';
 import 'package:local_walking_route/feature/walking_route/domain/repositories/walking_route_repository.dart';
 import 'package:local_walking_route/feature/walking_route/domain/usecases/get_current_location.dart';
-import 'package:local_walking_route/feature/walking_route/presentation/bloc/bloc/walking_route_bloc.dart';
+import 'package:local_walking_route/feature/walking_route/presentation/bloc/bloc/get_current_location_bloc/getCurrent_location_bloc.dart';
+import 'package:local_walking_route/feature/walking_route/presentation/bloc/bloc/get_random_routes_bloc/get_random_routes_bloc.dart';
 
+import 'core/utils/input_converter.dart';
 import 'feature/walking_route/data/datasources/current_location_remote_data_source.dart';
 
 final sl = GetIt.instance;
 
 Future<void> init() async {
   sl.registerFactory(
-    () => WalkingRouteBloc(
+    () => CurrentLocationBloc(
       location: sl(),
     ),
   );
 
+  sl.registerFactory(
+    () => RandomRoutesBloc(routes: sl(), inputConverter: sl()),
+  );
+
   sl.registerLazySingleton(() => GetCurrentLocation(sl()));
+  sl.registerLazySingleton(() => GetRandomRoute(sl()));
+  sl.registerLazySingleton(() => InputConverter());
 
   sl.registerLazySingleton<WalkingRouteRepository>(
-    () => WalkingRouteRepositoryImpl(remoteDataSource: sl(), allInfo: sl()),
+    () => WalkingRouteRepositoryImpl(
+        remoteDataSource: sl(),
+        networkInfo: sl(),
+        gpsInfo: sl(),
+        locationPermissionInfo: sl()),
   );
 
   sl.registerLazySingleton<CurrentLocationRemoteDataSource>(

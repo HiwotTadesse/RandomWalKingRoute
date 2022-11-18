@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:local_walking_route/core/usecases/usecase.dart';
-import 'package:local_walking_route/feature/walking_route/domain/entities/CurrentLocation.dart';
+import 'package:local_walking_route/feature/walking_route/domain/entities/current_location.dart';
 import 'package:local_walking_route/feature/walking_route/domain/repositories/walking_route_repository.dart';
 import 'package:local_walking_route/feature/walking_route/domain/usecases/get_current_location.dart';
 import 'package:mockito/mockito.dart';

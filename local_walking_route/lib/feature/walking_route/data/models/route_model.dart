@@ -1,12 +1,14 @@
 import 'package:local_walking_route/feature/walking_route/domain/entities/current_location.dart';
 import 'dart:convert';
 
-class CurrentLocationModel extends CurrentLocation {
-  const CurrentLocationModel({longitude, latitude})
+import 'package:local_walking_route/feature/walking_route/domain/entities/route.dart';
+
+class RouteModel extends Route {
+  const RouteModel({longitude, latitude})
       : super(latitude: latitude, longitude: longitude);
 
-  factory CurrentLocationModel.fromJson(Map<String, dynamic> mapData) {
-    return CurrentLocationModel(
+  factory RouteModel.fromJson(Map<String, dynamic> mapData) {
+    return RouteModel(
         latitude: mapData['latitude'], longitude: mapData['longitude']);
   }
 

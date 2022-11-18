@@ -1,6 +1,9 @@
 import 'package:dartz/dartz.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:local_walking_route/core/usecases/usecase.dart';
-import 'package:local_walking_route/feature/walking_route/domain/entities/CurrentLocation.dart';
+import 'package:local_walking_route/feature/walking_route/data/models/routes_model.dart';
+import 'package:local_walking_route/feature/walking_route/domain/entities/current_location.dart';
+import 'package:local_walking_route/feature/walking_route/domain/entities/route.dart';
 import 'package:local_walking_route/feature/walking_route/domain/repositories/walking_route_repository.dart';
 
 import '../../../../core/error/failures.dart';
@@ -13,5 +16,17 @@ class GetCurrentLocation extends UseCase<CurrentLocation, NoParams> {
   @override
   Future<Either<Failure, CurrentLocation>> call(NoParams params) async {
     return await walkingRouteRepository.getCurrentLocation();
+  }
+}
+
+class GetRandomRoute extends UseCase<Map<PolylineId, Polyline>, Params> {
+  final WalkingRouteRepository walkingRouteRepository;
+
+  GetRandomRoute(this.walkingRouteRepository);
+
+  @override
+  Future<Either<Failure, Map<PolylineId, Polyline>>> call(Params params) async {
+    return await walkingRouteRepository.getRandomSetOfRoutes(
+        params.currentLocation, params.minutes);
   }
 }
