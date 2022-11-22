@@ -9,7 +9,7 @@ abstract class RandomRoutesEvent extends Equatable {
 }
 
 class GetRandomRoutesEvent extends RandomRoutesEvent {
-  final int minute;
+  final String minute;
   final CurrentLocation currentLocation;
 
   const GetRandomRoutesEvent({this.minute, this.currentLocation});

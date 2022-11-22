@@ -1,9 +1,12 @@
 import 'dart:async';
 
+import 'package:dartz/dartz_unsafe.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:local_walking_route/feature/walking_route/data/models/route_model.dart';
+import 'package:local_walking_route/feature/walking_route/data/models/routes_model.dart';
 import 'package:local_walking_route/feature/walking_route/domain/entities/current_location.dart';
 import 'package:local_walking_route/feature/walking_route/domain/usecases/get_current_location.dart';
 import 'package:local_walking_route/feature/walking_route/presentation/bloc/bloc/get_random_routes_bloc/get_random_routes_bloc.dart';
@@ -43,10 +46,17 @@ class _WalkingRouteScreenState extends State<WalkingRouteScreen> {
       markers[const MarkerId('place_name')] = marker;
     });
     streamController.stream
-        .debounce(const Duration(milliseconds: 400))
+        .debounce(const Duration(milliseconds: 1000))
         .listen((s) => _validateValues(widget.currentLocation));
 
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    streamController.close();
+    mapController.dispose();
+    super.dispose();
   }
 
   @override
@@ -67,7 +77,7 @@ class _WalkingRouteScreenState extends State<WalkingRouteScreen> {
           const SizedBox(
             height: 10,
           ),
-          _buildMapComponent()
+          _buildMapComponent(routesModel: RoutesModel(routesModel: []))
         ]);
       } else if (state is RandomRoutesLoading) {
         return const Center(
@@ -80,7 +90,7 @@ class _WalkingRouteScreenState extends State<WalkingRouteScreen> {
           const SizedBox(
             height: 10,
           ),
-          _buildMapComponent(polylines: state.setOfRoutes)
+          _buildMapComponent(routesModel: state.setOfRoutes)
         ]);
       } else if (state is RandomRoutesError) {
         return Center(
@@ -110,7 +120,7 @@ class _WalkingRouteScreenState extends State<WalkingRouteScreen> {
               ),
               TextField(
                 controller: controller,
-                keyboardType: TextInputType.number,
+                keyboardType: TextInputType.text,
                 decoration: const InputDecoration(
                   border: UnderlineInputBorder(),
                   hintText: 'Input a number',
@@ -123,7 +133,29 @@ class _WalkingRouteScreenState extends State<WalkingRouteScreen> {
             ]));
   }
 
-  Widget _buildMapComponent({Map<PolylineId, Polyline> polylines = const {}}) {
+  Widget _buildMapComponent({@required RoutesModel routesModel}) {
+    PolylineId id2 = const PolylineId('poly2');
+    Polyline polyline1 = Polyline(polylineId: id2, points: const [], width: 5);
+    if (routesModel.routesModel.isNotEmpty) {
+      List<LatLng> list = [];
+
+      list.add(LatLng(
+          widget.currentLocation.latitude, widget.currentLocation.longitude));
+      routesModel.routesModel.forEach((RouteModel point) {
+        list.add(LatLng(point.latitude, point.longitude));
+      });
+      polyline1 = Polyline(
+          polylineId: const PolylineId('poly3'),
+          color: Colors.red,
+          points: list,
+          width: 2,
+          patterns: [
+            PatternItem.dash(8),
+            PatternItem.gap(15),
+          ],
+          jointType: JointType.mitered);
+    }
+
     return Expanded(
         flex: 2,
         child: GoogleMap(
@@ -132,11 +164,11 @@ class _WalkingRouteScreenState extends State<WalkingRouteScreen> {
           initialCameraPosition: CameraPosition(
             target: LatLng(widget.currentLocation.latitude,
                 widget.currentLocation.longitude),
-            zoom: 15.0,
+            zoom: 55.0,
           ),
           markers: markers.values.toSet(),
-          mapType: MapType.normal,
-          polylines: Set<Polyline>.of(polylines.values),
+          //  polygons: {polygon},
+          polylines: {polyline1},
           onMapCreated: (controller) {
             setState(() {
               mapController = controller;
@@ -146,10 +178,9 @@ class _WalkingRouteScreenState extends State<WalkingRouteScreen> {
   }
 
   _validateValues(CurrentLocation currentLocation) {
-    if (controller.text.length > 1) {
+    if (controller.text.isNotEmpty) {
       BlocProvider.of<RandomRoutesBloc>(context).add(GetRandomRoutesEvent(
-          minute: int.parse(controller.text),
-          currentLocation: currentLocation));
+          minute: controller.text, currentLocation: currentLocation));
     } else {}
   }
 }

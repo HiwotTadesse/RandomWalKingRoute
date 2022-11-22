@@ -1,7 +1,6 @@
 import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get_it/get_it.dart';
-import 'package:local_walking_route/core/platform/all_in_one_info.dart';
 import 'package:local_walking_route/core/platform/gps_info.dart';
 import 'package:local_walking_route/core/platform/location_permission_info.dart';
 import 'package:local_walking_route/core/platform/network_info.dart';
@@ -42,8 +41,6 @@ Future<void> init() async {
   sl.registerLazySingleton<CurrentLocationRemoteDataSource>(
     () => CurrentLocationRemoteDataSourceImpl(geolocatorPlatform: sl()),
   );
-  sl.registerLazySingleton<AllInfo>(() => AllInfoImpl(
-      networkInfo: sl(), gpsInfo: sl(), locationPermissionInfo: sl()));
   sl.registerLazySingleton<GpsInfo>(() => GpsInfoImpl(sl()));
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
   sl.registerLazySingleton<LocationPermissionInfo>(

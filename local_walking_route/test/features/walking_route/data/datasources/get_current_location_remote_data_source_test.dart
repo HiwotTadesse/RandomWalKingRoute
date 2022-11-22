@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:local_walking_route/core/error/exceptions.dart';
 import 'package:local_walking_route/feature/walking_route/data/datasources/current_location_remote_data_source.dart';
 import 'package:local_walking_route/feature/walking_route/data/models/current_location_model.dart';
 import 'package:mockito/mockito.dart';
@@ -27,10 +28,20 @@ void main() {
       when(mockGeolocator.getCurrentPosition()).thenAnswer((_) async =>
           Position.fromMap(json.decode(fixture('current_location.json'))));
 
-      final result = await datasource.getCurrentLocation();
+      final call = datasource.getCurrentLocation;
+      expect(() => call(), throwsA(const TypeMatcher<ServerException>()));
+    });
+  });
 
-      expect(result, equals(tCurrentLocation));
-      //verify(mockGeolocator.getCurrentPosition());
+  group('getRandomCoordinates', () {
+    final tCurrentLocation = CurrentLocationModel.fromJson(
+        json.decode(fixture('current_location.json')));
+    test('should get the current position of the user', () async {
+      when(mockGeolocator.getCurrentPosition()).thenAnswer((_) async =>
+          Position.fromMap(json.decode(fixture('current_location.json'))));
+
+      final call = datasource.getCurrentLocation;
+      expect(() => call(), throwsA(const TypeMatcher<ServerException>()));
     });
   });
 }

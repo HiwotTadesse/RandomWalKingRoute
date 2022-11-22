@@ -27,9 +27,9 @@ void main() {
   const tRoutesModel = RoutesModel(routesModel: [tRouteModel1, tRouteModel2]);
 
   test('should get set of routes from repository', () async {
-    // when(mockWalkingRoutesRepository.getRandomSetOfRoutes(
-    //       tCurrentLocation, tMinute))
-    // .thenAnswer((_) async => const Right());
+    when(mockWalkingRoutesRepository.getRandomSetOfRoutes(
+            tCurrentLocation, tMinute))
+        .thenAnswer((_) async => const Right(tRoutesModel));
 
     final result = await usecase(
         const Params(minutes: tMinute, currentLocation: tCurrentLocation));

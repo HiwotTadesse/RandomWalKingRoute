@@ -46,7 +46,7 @@ dependencies:
   flutter_polyline_points: ^1.0.0
   stream_transform: ^2.1.0
 
-
+  maps_toolkit: ^1.0.1
 
 
   # The following adds the Cupertino Icons font to your application.

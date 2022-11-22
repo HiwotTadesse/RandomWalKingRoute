@@ -8,6 +8,6 @@ import '../entities/route.dart';
 
 abstract class WalkingRouteRepository {
   Future<Either<Failure, CurrentLocation>> getCurrentLocation();
-  Future<Either<Failure, Map<PolylineId, Polyline>>> getRandomSetOfRoutes(
+  Future<Either<Failure, RoutesModel>> getRandomSetOfRoutes(
       CurrentLocation currentLocation, int minute);
 }

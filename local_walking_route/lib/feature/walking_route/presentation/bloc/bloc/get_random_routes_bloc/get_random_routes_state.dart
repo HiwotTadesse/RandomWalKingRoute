@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:local_walking_route/feature/walking_route/data/models/routes_model.dart';
 
 import '../../../../domain/entities/current_location.dart';
 
@@ -15,7 +16,7 @@ class RandomRoutesInitial extends RandomRoutesState {}
 class RandomRoutesLoading extends RandomRoutesState {}
 
 class RandomRoutesLoaded extends RandomRoutesState {
-  final Map<PolylineId, Polyline> setOfRoutes;
+  final RoutesModel setOfRoutes;
   const RandomRoutesLoaded({this.setOfRoutes});
 
   @override

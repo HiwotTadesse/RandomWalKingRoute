@@ -1,7 +1,6 @@
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:local_walking_route/core/error/exceptions.dart';
-import 'package:local_walking_route/core/platform/all_in_one_info.dart';
 import 'package:local_walking_route/core/platform/location_permission_info.dart';
 import 'package:local_walking_route/feature/walking_route/data/datasources/current_location_remote_data_source.dart';
 import 'package:local_walking_route/core/error/failures.dart';
@@ -27,51 +26,55 @@ class WalkingRouteRepositoryImpl extends WalkingRouteRepository {
 
   @override
   Future<Either<Failure, CurrentLocation>> getCurrentLocation() async {
-    try {
-      final networkResult = await networkInfo.isConnected;
-      final gpsResult = await gpsInfo.isEnabled;
-      LocationPermission permission = await Geolocator.checkPermission();
-      final permissionResult = await locationPermissionInfo
-          .checkPermissionInfo()
-          .then((value) async {
-        if (value == LocationPermission.denied) {
-          permission = await Geolocator.requestPermission();
-          if (permission == LocationPermission.denied) {
-            return false;
-          } else if (permission == LocationPermission.deniedForever) {
-            return false;
-          } else {
-            return true;
-          }
-        } else {
-          return true;
-        }
-      });
-      if (networkResult && gpsResult && permissionResult) {
+    if (await gpsInfo.isEnabled &&
+        await networkInfo.isConnected &&
+        await locationPermissionInfo.checkPermissionInfo) {
+      try {
         final remoteCurrentLocation =
             await remoteDataSource.getCurrentLocation();
         return Right(remoteCurrentLocation);
-      } else {
-        if (!networkResult) {
-          return Left(ConnectionFailure());
-        } else if (!gpsResult) {
-          return Left(GpsFailure());
-        } else if (!permissionResult) {
-          return Left(PermissionFailure());
+      } on ServerException {
+        return Left(ServerFailure());
+      }
+    } else {
+      try {
+        if (!await networkInfo.isConnected) {
+          await remoteDataSource.getCurrentLocation();
+          throw ConnectionException();
+        } else if (!await gpsInfo.isEnabled) {
+          await remoteDataSource.getCurrentLocation();
+          throw GpsException();
+        } else if (!await locationPermissionInfo.checkPermissionInfo) {
+          await remoteDataSource.getCurrentLocation();
+          throw PermissionException();
         } else {
           throw ServerException();
         }
+      } on ConnectionException {
+        return Left(ConnectionFailure());
+      } on GpsException {
+        return Left(GpsFailure());
+      } on PermissionException {
+        return Left(PermissionFailure());
+      } on ServerException {
+        return Left(ServerFailure());
       }
-    } on ServerException {
-      return Left(ServerFailure());
     }
   }
 
   @override
-  Future<Either<Failure, Map<PolylineId, Polyline>>> getRandomSetOfRoutes(
+  Future<Either<Failure, RoutesModel>> getRandomSetOfRoutes(
       CurrentLocation currentLocation, int minute) async {
-    final remoteCurrentLocation = await remoteDataSource
-        .getRandomlyGeneratedRoutes(currentLocation, minute);
-    return Right(remoteCurrentLocation);
+    final routes = await remoteDataSource.getRandomlyGeneratedRoutes(
+        currentLocation, minute);
+    try {
+      if (routes != null) {
+        return Right(routes);
+      } else {
+        throw ServerException();
+      }
+    } on ServerException {
+      return Left(ServerFailure());
+    }
   }
 }

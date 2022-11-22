@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:local_walking_route/core/usecases/usecase.dart';
 import 'package:local_walking_route/core/utils/input_converter.dart';
+import 'package:local_walking_route/feature/walking_route/data/models/routes_model.dart';
 import 'package:local_walking_route/feature/walking_route/domain/usecases/get_current_location.dart';
 import 'package:local_walking_route/feature/walking_route/presentation/bloc/bloc/get_random_routes_bloc/get_random_routes_event.dart';
 import 'package:local_walking_route/feature/walking_route/presentation/bloc/bloc/get_random_routes_bloc/get_random_routes_state.dart';
@@ -29,8 +30,7 @@ class RandomRoutesBloc extends Bloc<RandomRoutesEvent, RandomRoutesState> {
     RandomRoutesEvent event,
   ) async* {
     if (event is GetRandomRoutesEvent) {
-      final inputEither =
-          inputConverter.stringToUnsignedInteger(event.minute.toString());
+      final inputEither = inputConverter.stringToUnsignedInteger(event.minute);
 
       yield* inputEither.fold(
         (failure) async* {
@@ -49,11 +49,11 @@ class RandomRoutesBloc extends Bloc<RandomRoutesEvent, RandomRoutesState> {
   }
 
   Stream<RandomRoutesState> _eitherLoadedOrErrorState(
-    Either<Failure, Map<PolylineId, Polyline>> failureOrPolyLine,
+    Either<Failure, RoutesModel> failureOrPolyLine,
   ) async* {
     yield failureOrPolyLine.fold(
       (failure) => RandomRoutesError(message: _mapFailureToMessage(failure)),
-      (ploylines) => RandomRoutesLoaded(setOfRoutes: ploylines),
+      (routes) => RandomRoutesLoaded(setOfRoutes: routes),
     );
   }
 

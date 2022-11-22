@@ -19,13 +19,13 @@ class GetCurrentLocation extends UseCase<CurrentLocation, NoParams> {
   }
 }
 
-class GetRandomRoute extends UseCase<Map<PolylineId, Polyline>, Params> {
+class GetRandomRoute extends UseCase<RoutesModel, Params> {
   final WalkingRouteRepository walkingRouteRepository;
 
   GetRandomRoute(this.walkingRouteRepository);
 
   @override
-  Future<Either<Failure, Map<PolylineId, Polyline>>> call(Params params) async {
+  Future<Either<Failure, RoutesModel>> call(Params params) async {
     return await walkingRouteRepository.getRandomSetOfRoutes(
         params.currentLocation, params.minutes);
   }
