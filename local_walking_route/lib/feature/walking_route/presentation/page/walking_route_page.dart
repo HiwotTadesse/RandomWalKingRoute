@@ -77,7 +77,7 @@ class _WalkingRouteScreenState extends State<WalkingRouteScreen> {
           const SizedBox(
             height: 10,
           ),
-          _buildMapComponent(routesModel: RoutesModel(routesModel: []))
+          _buildMapComponent(routesModel: const [])
         ]);
       } else if (state is RandomRoutesLoading) {
         return const Center(
@@ -129,25 +129,55 @@ class _WalkingRouteScreenState extends State<WalkingRouteScreen> {
                   streamController.add(value);
                 },
                 onSubmitted: (_) {},
-              )
+              ),
             ]));
   }
 
-  Widget _buildMapComponent({@required RoutesModel routesModel}) {
+  Widget _buildMapComponent({@required List<RoutesModel> routesModel}) {
     PolylineId id2 = const PolylineId('poly2');
-    Polyline polyline1 = Polyline(polylineId: id2, points: const [], width: 5);
-    if (routesModel.routesModel.isNotEmpty) {
+    PolylineId id3 = const PolylineId('poly3');
+    PolylineId id4 = const PolylineId('poly4');
+    Polyline polyline1 = Polyline(polylineId: id2, points: const [], width: 2);
+    Polyline polyline3 = Polyline(polylineId: id3, points: const [], width: 2);
+    Polyline polyline4 = Polyline(polylineId: id4, points: const [], width: 2);
+    if (routesModel.isNotEmpty) {
       List<LatLng> list = [];
+      List<LatLng> list2 = [];
+      List<LatLng> list3 = [];
 
-      list.add(LatLng(
-          widget.currentLocation.latitude, widget.currentLocation.longitude));
-      routesModel.routesModel.forEach((RouteModel point) {
+      routesModel[0].routesModel.forEach((RouteModel point) {
         list.add(LatLng(point.latitude, point.longitude));
       });
+      routesModel[1].routesModel.forEach((RouteModel point) {
+        list2.add(LatLng(point.latitude, point.longitude));
+      });
+      routesModel[2].routesModel.forEach((RouteModel point) {
+        list3.add(LatLng(point.latitude, point.longitude));
+      });
       polyline1 = Polyline(
-          polylineId: const PolylineId('poly3'),
+          polylineId: const PolylineId('poly2'),
           color: Colors.red,
           points: list,
+          width: 2,
+          patterns: [
+            PatternItem.dash(8),
+            PatternItem.gap(15),
+          ],
+          jointType: JointType.mitered);
+      polyline3 = Polyline(
+          polylineId: const PolylineId('poly3'),
+          color: Colors.red,
+          points: list2,
+          width: 2,
+          patterns: [
+            PatternItem.dash(8),
+            PatternItem.gap(15),
+          ],
+          jointType: JointType.mitered);
+      polyline4 = Polyline(
+          polylineId: const PolylineId('poly4'),
+          color: Colors.red,
+          points: list3,
           width: 2,
           patterns: [
             PatternItem.dash(8),
@@ -168,7 +198,7 @@ class _WalkingRouteScreenState extends State<WalkingRouteScreen> {
           ),
           markers: markers.values.toSet(),
           //  polygons: {polygon},
-          polylines: {polyline1},
+          polylines: {polyline1, polyline3, polyline4},
           onMapCreated: (controller) {
             setState(() {
               mapController = controller;
@@ -178,9 +208,11 @@ class _WalkingRouteScreenState extends State<WalkingRouteScreen> {
   }
 
   _validateValues(CurrentLocation currentLocation) {
-    if (controller.text.isNotEmpty) {
-      BlocProvider.of<RandomRoutesBloc>(context).add(GetRandomRoutesEvent(
-          minute: controller.text, currentLocation: currentLocation));
-    } else {}
+    Future.delayed(Duration(seconds: 5), () {
+      if (controller.text.isNotEmpty) {
+        BlocProvider.of<RandomRoutesBloc>(context).add(GetRandomRoutesEvent(
+            minute: controller.text, currentLocation: currentLocation));
+      } else {}
+    });
   }
 }

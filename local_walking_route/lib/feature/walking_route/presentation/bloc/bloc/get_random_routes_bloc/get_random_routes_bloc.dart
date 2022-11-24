@@ -49,7 +49,7 @@ class RandomRoutesBloc extends Bloc<RandomRoutesEvent, RandomRoutesState> {
   }
 
   Stream<RandomRoutesState> _eitherLoadedOrErrorState(
-    Either<Failure, RoutesModel> failureOrPolyLine,
+    Either<Failure, List<RoutesModel>> failureOrPolyLine,
   ) async* {
     yield failureOrPolyLine.fold(
       (failure) => RandomRoutesError(message: _mapFailureToMessage(failure)),

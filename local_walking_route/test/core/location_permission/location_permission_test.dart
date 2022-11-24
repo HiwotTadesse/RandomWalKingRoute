@@ -24,7 +24,7 @@ void main() {
     //   when(mockGeolocator.checkPermission())
     //       .thenAnswer((_) => tCheckPermission);
 
-    //   final result = await locationPermissionInfoImpl.checkPermissionInfo();
+    //   final result = await locationPermissionInfoImpl.checkPermissionInfo;
 
     //   expect(result, tCheckPermission);
     // });

@@ -24,7 +24,9 @@ void main() {
 
   test(
       'should wait for 3 seconds before the get current position event dispatched',
-      () async {
-    currentLocationBloc.add(GetCurrentLocationEvent());
+      () async* {
+    Future.delayed(Duration(seconds: 5), () {
+      currentLocationBloc.add(GetCurrentLocationEvent());
+    });
   });
 }

@@ -16,7 +16,7 @@ class RandomRoutesInitial extends RandomRoutesState {}
 class RandomRoutesLoading extends RandomRoutesState {}
 
 class RandomRoutesLoaded extends RandomRoutesState {
-  final RoutesModel setOfRoutes;
+  final List<RoutesModel> setOfRoutes;
   const RandomRoutesLoaded({this.setOfRoutes});
 
   @override

@@ -20,6 +20,7 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen>
     with TickerProviderStateMixin {
   AnimationController animationController;
+  String message = "";
 
   @override
   void initState() {
@@ -54,7 +55,7 @@ class _SplashScreenState extends State<SplashScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Expanded(
-              flex: 4,
+              flex: 5,
               child: SizedBox(),
             ),
             const SizedBox(
@@ -68,21 +69,10 @@ class _SplashScreenState extends State<SplashScreen>
                   color: Colors.black,
                   fontSize: 20),
             ),
-            const SizedBox(
-              width: 5,
-            ),
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
-                  Icons.phone_in_talk,
-                  size: 18,
-                  color: Colors.white,
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -106,10 +96,13 @@ class _SplashScreenState extends State<SplashScreen>
                 child: BlocBuilder<CurrentLocationBloc, CurrentLocationState>(
                     builder: (context, state) {
                   if (state is CurrentLocationInitial) {
+                    message = "";
                     return buildLoadingAnimation();
                   } else if (state is CurrentLocationLoading) {
+                    message = "";
                     return buildLoadingAnimation();
                   } else if (state is CurrentLocationLoaded) {
+                    message = "";
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       Navigator.pushReplacement(
                           context,

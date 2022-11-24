@@ -40,6 +40,10 @@ void main() {
     const tRouteModel2 = RouteModel(longitude: 11.2, latitude: 12.3);
     final tRoutesModel = RoutesModel(routesModel: [tRouteModel1, tRouteModel2]);
 
+    const tRoutesModel2 =
+        RoutesModel(routesModel: [tRouteModel1, tRouteModel2]);
+    List<RoutesModel> tRoutesModelList = [tRoutesModel, tRoutesModel2];
+
     test(
       'should call the InputConverter to validate and convert the string to an unsigned integer',
       () async {
@@ -54,7 +58,7 @@ void main() {
 
     test(
       'should emit [Error] when the input is invalid',
-      () async {
+      () async* {
         when(mockInputConverter.stringToUnsignedInteger(any))
             .thenReturn(Left(InvalidInputFailure()));
 
@@ -63,7 +67,7 @@ void main() {
           const RandomRoutesError(message: "Invalid Input"),
         ];
 
-        expectLater(randomRoutesBloc.state, emitsInOrder(expected));
+        expectLater(randomRoutesBloc, emitsInOrder(expected));
         randomRoutesBloc.add(GetRandomRoutesEvent(
             minute: tMinute, currentLocation: tCurrentLocation));
       },
@@ -71,27 +75,27 @@ void main() {
 
     test(
       'should emit [Loading, Loaded] when data is gotten successfully',
-      () async {
+      () async* {
         when(mockInputConverter.stringToUnsignedInteger(any))
             .thenReturn(Right(tMinuteParsed));
 
         when(mockGetRandomRoute(any))
-            .thenAnswer((_) async => Right(tRoutesModel));
+            .thenAnswer((_) async => Right(tRoutesModelList));
 
         randomRoutesBloc.add(GetRandomRoutesEvent(
             minute: tMinute, currentLocation: tCurrentLocation));
         final expected = [
           RandomRoutesInitial(),
           RandomRoutesLoading(),
-          RandomRoutesLoaded(setOfRoutes: tRoutesModel),
+          RandomRoutesLoaded(setOfRoutes: tRoutesModelList),
         ];
-        expectLater(randomRoutesBloc.state, emitsInOrder(expected));
+        expectLater(randomRoutesBloc, emitsInOrder(expected));
       },
     );
 
     test(
       'should emit [Loading, error] when data is gotten unsuccessfully',
-      () async {
+      () async* {
         when(mockInputConverter.stringToUnsignedInteger(any))
             .thenReturn(Right(tMinuteParsed));
 
@@ -105,7 +109,7 @@ void main() {
           RandomRoutesLoading(),
           const RandomRoutesError(message: "Server Failure"),
         ];
-        expectLater(randomRoutesBloc.state, emitsInOrder(expected));
+        expectLater(randomRoutesBloc, emitsInOrder(expected));
       },
     );
   });

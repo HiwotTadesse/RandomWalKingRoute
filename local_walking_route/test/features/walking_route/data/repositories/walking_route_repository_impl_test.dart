@@ -9,7 +9,10 @@ import 'package:local_walking_route/core/platform/location_permission_info.dart'
 import 'package:local_walking_route/core/platform/network_info.dart';
 import 'package:local_walking_route/feature/walking_route/data/datasources/current_location_remote_data_source.dart';
 import 'package:local_walking_route/feature/walking_route/data/models/current_location_model.dart';
+import 'package:local_walking_route/feature/walking_route/data/models/route_model.dart';
+import 'package:local_walking_route/feature/walking_route/data/models/routes_model.dart';
 import 'package:local_walking_route/feature/walking_route/data/repositories/walking_route_repository_impl.dart';
+import 'package:local_walking_route/feature/walking_route/domain/entities/current_location.dart';
 import 'package:mockito/mockito.dart';
 import 'dart:convert';
 
@@ -162,6 +165,60 @@ void main() {
 
       verify(mockRemoteDataSource.getCurrentLocation());
       expect(result, equals(left(ConnectionFailure())));
+    });
+  });
+
+  group('the device connection is all not enabled', () {
+    const tCurrentLocation = CurrentLocation(latitude: 1.1, longitude: 1.2);
+    const tMinute = 1;
+
+    setUp(() {
+      when(mockNetworkInfo.isConnected).thenAnswer((_) async => false);
+    });
+
+    test(
+        'should return server failure when the call to remote data source is successful',
+        () async {
+      when(mockRemoteDataSource.getCurrentLocation())
+          .thenThrow(ConnectionException());
+
+      final result =
+          await repositoryImpl.getRandomSetOfRoutes(tCurrentLocation, tMinute);
+
+      verify(mockRemoteDataSource.getRandomlyGeneratedRoutes(
+          tCurrentLocation, tMinute));
+      expect(result, equals(left(ConnectionFailure())));
+    });
+  });
+
+  group('the device is all enabled', () {
+    const tCurrentLocation = CurrentLocation(latitude: 1.1, longitude: 1.2);
+    const tMinute = 1;
+
+    const tRouteModel1 = RouteModel(longitude: 11.2, latitude: 12.3);
+    const tRouteModel2 = RouteModel(longitude: 11.2, latitude: 12.3);
+    const tRoutesModel = RoutesModel(routesModel: [tRouteModel1, tRouteModel2]);
+    const tRoutesModel2 =
+        RoutesModel(routesModel: [tRouteModel1, tRouteModel2]);
+    List<RoutesModel> tRoutesModelList = [tRoutesModel, tRoutesModel2];
+
+    setUp(() {
+      when(mockNetworkInfo.isConnected).thenAnswer((_) async => true);
+    });
+
+    test(
+        'should return with coordinates when the call to remote data source is successful',
+        () async {
+      when(mockRemoteDataSource.getRandomlyGeneratedRoutes(
+              tCurrentLocation, tMinute))
+          .thenAnswer((_) async => tRoutesModelList);
+
+      final result =
+          await repositoryImpl.getRandomSetOfRoutes(tCurrentLocation, tMinute);
+
+      verify(mockRemoteDataSource.getRandomlyGeneratedRoutes(
+          tCurrentLocation, tMinute));
+      expect(result, equals(Right(tRoutesModelList)));
     });
   });
 }

@@ -63,18 +63,30 @@ class WalkingRouteRepositoryImpl extends WalkingRouteRepository {
   }
 
   @override
-  Future<Either<Failure, RoutesModel>> getRandomSetOfRoutes(
+  Future<Either<Failure, List<RoutesModel>>> getRandomSetOfRoutes(
       CurrentLocation currentLocation, int minute) async {
-    final routes = await remoteDataSource.getRandomlyGeneratedRoutes(
-        currentLocation, minute);
-    try {
-      if (routes != null) {
+    if (await networkInfo.isConnected) {
+      try {
+        final routes = await remoteDataSource.getRandomlyGeneratedRoutes(
+            currentLocation, minute);
         return Right(routes);
-      } else {
-        throw ServerException();
+      } on ServerException {
+        return Left(ServerFailure());
       }
-    } on ServerException {
-      return Left(ServerFailure());
+    } else {
+      try {
+        if (!await networkInfo.isConnected) {
+          await remoteDataSource.getRandomlyGeneratedRoutes(
+              currentLocation, minute);
+          throw ConnectionException();
+        } else {
+          throw ServerException();
+        }
+      } on ConnectionException {
+        return Left(ConnectionFailure());
+      } on ServerException {
+        return Left(ServerFailure());
+      }
     }
   }
 }

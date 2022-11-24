@@ -25,16 +25,18 @@ void main() {
   const tRouteModel1 = RouteModel(longitude: 11.2, latitude: 12.3);
   const tRouteModel2 = RouteModel(longitude: 11.2, latitude: 12.3);
   const tRoutesModel = RoutesModel(routesModel: [tRouteModel1, tRouteModel2]);
+  const tRoutesModel2 = RoutesModel(routesModel: [tRouteModel1, tRouteModel2]);
+  List<RoutesModel> tRoutesModelList = [tRoutesModel, tRoutesModel2];
 
   test('should get set of routes from repository', () async {
     when(mockWalkingRoutesRepository.getRandomSetOfRoutes(
             tCurrentLocation, tMinute))
-        .thenAnswer((_) async => const Right(tRoutesModel));
+        .thenAnswer((_) async => Right(tRoutesModelList));
 
     final result = await usecase(
         const Params(minutes: tMinute, currentLocation: tCurrentLocation));
 
-    expect(result, const Right(tRoutesModel));
+    expect(result, Right(tRoutesModelList));
 
     verify(mockWalkingRoutesRepository.getRandomSetOfRoutes(
         tCurrentLocation, tMinute));
